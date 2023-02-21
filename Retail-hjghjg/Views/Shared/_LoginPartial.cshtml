@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Retail.Areas.Identity.Data
-@inject SignInManager<RetailUser> SignInManager
-@inject UserManager<RetailUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
@@ -10,7 +9,7 @@
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
     </li>
     <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="CustomerRecords" asp-action="Index">Customer Information</a>
+        <a class="nav-link text-dark" asp-area="" asp-controller="CustomerRecords" asp-action="Index">Customer Information</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
@@ -28,5 +27,3 @@ else
     </li>
 }
 </ul>
-
-
