@@ -13,5 +13,7 @@ public class RetailUser : IdentityUser
     public string? Name { get; set; }
     [PersonalData]
     public DateTime DOB { get; set; }
+    [PersonalData]
+    public string? SocialSecurityNumber { get; set; }
 }
 

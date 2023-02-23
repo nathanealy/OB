@@ -67,6 +67,12 @@ namespace Retail.Areas.Identity.Pages.Account.Manage
             [DataType(DataType.Date)]
             public DateTime DOB { get; set; }
 
+            [Required]
+            [Display(Name = "Social Security Number")]
+            [DataType(DataType.Text)]
+            public string SSN { get; set; }
+
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -83,6 +89,7 @@ namespace Retail.Areas.Identity.Pages.Account.Manage
             {
                 Name = user.Name,
                 DOB = user.DOB,
+                SSN = user.SocialSecurityNumber,
                 PhoneNumber = phoneNumber
             };
         }
@@ -132,6 +139,11 @@ namespace Retail.Areas.Identity.Pages.Account.Manage
             if (Input.DOB != user.DOB)
             {
                 user.DOB = Input.DOB;
+            }
+
+            if (Input.SSN != user.SocialSecurityNumber)
+            {
+                user.SocialSecurityNumber = Input.SSN;
             }
 
             await _userManager.UpdateAsync(user);
