@@ -11,7 +11,6 @@ namespace Retail.Data
             : base(options)
         {
         }
-        public DbSet<Retail.Models.CustomerRecord> CustomerRecord { get; set; } = default!;
         public DbSet<RetailUser> RetailUser { get; set; }
     }
 }
