@@ -12,5 +12,8 @@ namespace Retail.Data
         {
         }
         public DbSet<RetailUser> RetailUser { get; set; }
+        public DbSet<Retail.Models.AccountActivity> AccountActivity { get; set; } = default!;
+        public DbSet<Retail.Models.AccountInformation> AccountInformation { get; set; } = default!;
+        public DbSet<Retail.Models.AssociatedAccount> AssociatedAccount { get; set; } = default!;
     }
 }

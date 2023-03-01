@@ -232,25 +232,110 @@ namespace Retail.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Retail.Models.AccountsUsers", b =>
+            modelBuilder.Entity("Retail.Models.AccountAct", b =>
                 {
-                    b.Property<int>("AccountId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PostDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TransactionAmount")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<decimal>("TransactionBalance")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccountAct");
+                });
+
+            modelBuilder.Entity("Retail.Models.BA", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("AccountNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("SocialSecurityNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
 
-                    b.HasKey("AccountId");
+                    b.HasKey("Id");
 
-                    b.ToTable("Account");
+                    b.ToTable("BA");
+                });
+
+            modelBuilder.Entity("Retail.Models.BAD", b =>
+                {
+                    b.Property<string>("AccountNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("AccountAvailableBalance")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<decimal>("AccountBalance")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<string>("AccountDescription")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("AccountHoldBalance")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<decimal>("AccountHolds")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
+
+                    b.Property<string>("AccountLabel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<long?>("BAId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AccountNumber");
+
+                    b.HasIndex("BAId");
+
+                    b.ToTable("BAD");
                 });
 
             modelBuilder.Entity("Retail.Areas.Identity.Data.RetailUser", b =>
@@ -318,6 +403,20 @@ namespace Retail.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Retail.Models.BAD", b =>
+                {
+                    b.HasOne("Retail.Models.BA", "BA")
+                        .WithMany("Details")
+                        .HasForeignKey("BAId");
+
+                    b.Navigation("BA");
+                });
+
+            modelBuilder.Entity("Retail.Models.BA", b =>
+                {
+                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }

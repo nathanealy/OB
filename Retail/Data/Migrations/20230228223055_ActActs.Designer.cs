@@ -12,8 +12,8 @@ using Retail.Data;
 namespace Retail.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230222154335_AddSSN")]
-    partial class AddSSN
+    [Migration("20230228223055_ActActs")]
+    partial class ActActs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -235,35 +235,45 @@ namespace Retail.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Retail.Models.CustomerRecord", b =>
+            modelBuilder.Entity("Retail.Models.AccountAct", b =>
                 {
-                    b.Property<int>("CustomerId")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Address")
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("BirthDate")
+                    b.Property<DateTime>("PostDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TransactionAmount")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
 
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TransactionBalance")
+                        .HasPrecision(13, 2)
+                        .HasColumnType("decimal(13,2)");
 
-                    b.Property<string>("State")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("ZipCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
 
-                    b.HasKey("CustomerId");
+                    b.HasKey("Id");
 
-                    b.ToTable("CustomerRecord");
+                    b.ToTable("AccountAct");
                 });
 
             modelBuilder.Entity("Retail.Areas.Identity.Data.RetailUser", b =>

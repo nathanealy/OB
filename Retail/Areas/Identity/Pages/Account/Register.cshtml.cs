@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Retail.Areas.Identity.Data;
+using Retail.Data;
 
 namespace Retail.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,15 @@ namespace Retail.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<RetailUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<RetailUser> userManager,
             IUserStore<RetailUser> userStore,
             SignInManager<RetailUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace Retail.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -82,6 +86,7 @@ namespace Retail.Areas.Identity.Pages.Account
             public DateTime DOB { get; set; }
 
             [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {6} and at max {9} characters long.", MinimumLength = 6)]
             [Display(Name = "Social Security Number")]
             [DataType(DataType.Text)]
             public string SSN { get; set; }

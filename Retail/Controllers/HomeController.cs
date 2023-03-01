@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Retail.Areas.Identity.Data;
 using Retail.Data;
-using Retail.Models;
-using System.Diagnostics;
 
 namespace Retail.Controllers
 {
@@ -18,12 +15,12 @@ namespace Retail.Controllers
         public HomeController(ILogger<HomeController> logger, SignInManager<RetailUser> signInManager, UserManager<RetailUser> userManager, ApplicationDbContext context)
         {
             _logger = logger;
-            _signInManager = signInManager; 
+            _signInManager = signInManager;
             _userManager = userManager;
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             if (_signInManager.IsSignedIn(User))
             {
@@ -40,12 +37,13 @@ namespace Retail.Controllers
                     string ssn = user.First().SocialSecurityNumber;
 
                     return View();
-                } 
+                }
                 catch
                 {
                     return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-                }              
+                }
             }
+
 
             return View();
         }
@@ -55,10 +53,5 @@ namespace Retail.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
