@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Retail.Areas.Identity.Data;
 using Retail.Data;
+using Retail.Models;
 
 namespace Retail.Areas.Identity.Pages.Account
 {
@@ -86,7 +87,7 @@ namespace Retail.Areas.Identity.Pages.Account
             public DateTime DOB { get; set; }
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {6} and at max {9} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "The Social Security Number must be at least 6 and at max 9 characters long.", MinimumLength = 6)]
             [Display(Name = "Social Security Number")]
             [DataType(DataType.Text)]
             public string SSN { get; set; }
@@ -143,7 +144,9 @@ namespace Retail.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
-                if (result.Succeeded)
+                var status = CreateBankAccounts(user.SocialSecurityNumber);
+
+                if (result.Succeeded && status == "OK")
                 {
                     _logger.LogInformation("User created a new account with password.");
 
@@ -168,7 +171,9 @@ namespace Retail.Areas.Identity.Pages.Account
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
+
                 }
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -177,6 +182,83 @@ namespace Retail.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private string CreateBankAccounts(string ssn)
+        {
+            var numberOfAccountsGenerator = new Random();
+            var numberOfAccounts = numberOfAccountsGenerator.Next(1, 10);
+
+            string[] accountNames = { "Free Checking", "Everything Checking", "No Minimum Checking", "Fashion Checking", "All-Star Checking", "Pioneer Checking", "Steelers Checking", "Pirates Checking", "Penguins Checking", "Maulers Checking" };
+
+            for (var i = 1; i <= numberOfAccounts; i++)
+            {
+                var accountNumberGenerator = new Random();
+                var accountNumber = accountNumberGenerator.Next(1, 999999999);
+
+                AccountInformation accountInformation = new AccountInformation();
+                accountInformation.AccountNumber = accountNumber.ToString().PadRight(9, '0');
+
+                var descriptionGenerator = new Random();
+                var c = descriptionGenerator.Next(10);
+
+                accountInformation.Description = accountNames[c];
+                accountInformation.Nickname = accountNames[c];
+
+                var balanceGenerator = new Random(numberOfAccounts);
+                var balance = balanceGenerator.Next(100, 1000000);
+
+                accountInformation.AccountBalance = balance;
+                accountInformation.AvailableBalance = balance;
+                accountInformation.HoldBalance = 0;
+                accountInformation.HoldsTotal = 0;
+
+                _context.AccountInformation.Add(accountInformation);
+
+                AssociatedAccount associatedAccount= new AssociatedAccount();
+
+                associatedAccount.SocialSecurityNumber = ssn;
+                associatedAccount.AccountNumber = accountNumber.ToString().PadRight(9, '0');
+
+                _context.AssociatedAccount.Add(associatedAccount);
+
+                var transactionNumberGenerator = new Random();
+                var transactionNumber = transactionNumberGenerator.Next(2, 20);
+
+                var transactionTypeGenerator = new Random();
+                var transactionGenerator = new Random(numberOfAccounts);
+                
+                for (var x = 1; x <= transactionNumber; x++)
+                {
+                    AccountActivity accountActivity= new AccountActivity();
+                    
+                    accountActivity.Account = accountNumber.ToString().PadRight(9, '0');
+                    accountActivity.PostDate = DateTime.Now;
+                    accountActivity.TransactionDate = DateTime.Now;
+                    accountActivity.Description = "Transaction";
+
+                    var transactionType = transactionTypeGenerator.Next(1, 2);
+
+                    string[] types = { "D", "C" };
+
+                    accountActivity.TransactionType = types[transactionType];
+                    accountActivity.TransactionBalance = balance;
+                    accountActivity.TransactionAmount = transactionGenerator.Next(10, 4000);
+
+                    _context.AccountActivity.Add(accountActivity);  
+                }
+
+            }
+
+            try
+            {
+                _context.SaveChanges();
+            } catch
+            {
+                return "error";
+            }
+
+            return "OK";
         }
 
         private RetailUser CreateUser()
