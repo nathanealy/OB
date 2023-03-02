@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Retail.Areas.Identity.Data;
 using Retail.Data;
+using Retail.Models;
+using System.Linq;
 
 namespace Retail.Controllers
 {
@@ -28,15 +31,34 @@ namespace Retail.Controllers
                 if (userId == null)
                 {
                     return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-
                 }
 
                 try
                 {
                     var user = _userManager.Users.Where(u => u.Id == userId);
-                    string ssn = user.First().SocialSecurityNumber;
+                    var ssn = user.First().SocialSecurityNumber;
+                    var associatedAccounts = _context.AssociatedAccount.Where(a => a.SocialSecurityNumber == ssn).ToList();
 
-                    return View();
+                    if(associatedAccounts == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    var ans = associatedAccounts.Select(x => x.AccountNumber);
+
+                    if (ans == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    var accountInformation = _context.AccountInformation.Where(a => ans.Contains(a.AccountNumber));
+
+                    if (accountInformation == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    return View(accountInformation);
                 }
                 catch
                 {

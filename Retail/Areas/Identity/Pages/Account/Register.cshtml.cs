@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Retail.Areas.Identity.Data;
 using Retail.Data;
 using Retail.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Retail.Areas.Identity.Pages.Account
 {
@@ -140,43 +141,55 @@ namespace Retail.Areas.Identity.Pages.Account
                 user.DOB = Input.DOB;
                 user.SocialSecurityNumber = Input.SSN;
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                var userQuery = _context.RetailUser.Where(r => r.SocialSecurityNumber == Input.SSN);
 
-                var status = CreateBankAccounts(user.SocialSecurityNumber);
-
-                if (result.Succeeded && status == "OK")
+                if (!userQuery.Any())
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                    var result = await _userManager.CreateAsync(user, Input.Password);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (result.Succeeded)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        _logger.LogInformation("Create account data.");
+
+                        var status = CreateBankAccounts(user.SocialSecurityNumber);
+
+                        _logger.LogInformation("User created a new account with password.");
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
+
                     }
 
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
-
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, "Social Security Number already exists");
                 }
             }
 
@@ -200,12 +213,12 @@ namespace Retail.Areas.Identity.Pages.Account
                 accountInformation.AccountNumber = accountNumber.ToString().PadRight(9, '0');
 
                 var descriptionGenerator = new Random();
-                var c = descriptionGenerator.Next(10);
+                var c = descriptionGenerator.Next(0,9);
 
                 accountInformation.Description = accountNames[c];
                 accountInformation.Nickname = accountNames[c];
 
-                var balanceGenerator = new Random(numberOfAccounts);
+                var balanceGenerator = new Random();
                 var balance = balanceGenerator.Next(100, 1000000);
 
                 accountInformation.AccountBalance = balance;
@@ -226,7 +239,7 @@ namespace Retail.Areas.Identity.Pages.Account
                 var transactionNumber = transactionNumberGenerator.Next(2, 20);
 
                 var transactionTypeGenerator = new Random();
-                var transactionGenerator = new Random(numberOfAccounts);
+                var transactionGenerator = new Random();
                 
                 for (var x = 1; x <= transactionNumber; x++)
                 {
@@ -237,7 +250,7 @@ namespace Retail.Areas.Identity.Pages.Account
                     accountActivity.TransactionDate = DateTime.Now;
                     accountActivity.Description = "Transaction";
 
-                    var transactionType = transactionTypeGenerator.Next(1, 2);
+                    var transactionType = transactionTypeGenerator.Next(2);
 
                     string[] types = { "D", "C" };
 
