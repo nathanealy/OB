@@ -1,39 +1,72 @@
 ﻿@model IEnumerable<Retail.Models.AccountInformation>
 
-<div class="row">
-    <div class="col-2">
-        @Html.DisplayNameFor(model => model.AccountNumber)
-    </div>
-    <div class="col-4">
-        @Html.DisplayNameFor(model => model.Nickname)
-    </div>
-    <div class="col-3">
-        @Html.DisplayNameFor(model => model.AccountBalance)
-    </div>
-    <div class="col-3">
-        @Html.DisplayNameFor(model => model.AvailableBalance)
-    </div>
-</div>
+
 
 @{
     var i = 0;
 
-    foreach (var item in Model) {
-        <div class="row">
-            <div class="col-2">            
-                    @Html.DisplayFor(modelItem => item.AccountNumber)            
-            </div>
-            <div class="col-4">
-                <input type="text" id="nickname-@i" value="@Html.DisplayFor(modelItem => item.Nickname)" placeholder="Nickname" /> <input type="button" id="update-@i" value="Update" />
-            </div>
-            <div class="col-3">
-                    $@Html.DisplayFor(modelItem => item.AccountBalance)
-            </div>
-            <div class="col-3">
-                    $@Html.DisplayFor(modelItem => item.AvailableBalance)
-            </div>    
-        </div>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "_AjaxAntiForgeryForm" }))
+    {
+        @Html.AntiForgeryToken();
 
-        i++;
-    }   
+        foreach (var item in Model)
+        {
+            <div id="account-group-@i" class="py-2">
+
+                <div id="top-header-row-@i" class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.AccountNumber)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayNameFor(model => model.Nickname)
+                    </div>
+                </div>
+
+
+                <div id="top-account-row-@i" class="row">
+                    <div class="col-4">            
+                        @Html.DisplayFor(modelItem => item.MaskedAccountNumber)            
+                    </div>
+                    <div class="col-8">
+                        <input type="text" id="nickname-@i" value="@Html.DisplayFor(modelItem => item.Nickname)" placeholder="Nickname" maxlength="20"/> <input type="button" id="update-@i" value="Update" /> <span id="error-@i"></span>
+                    </div>
+   
+                </div>
+
+
+                <div id="bottom-header-row-@i" class="row">
+                    <div class="col-4">
+                        @Html.DisplayNameFor(model => model.AccountBalance)
+                    </div>
+                    <div class="col-8">
+                        @Html.DisplayNameFor(model => model.AvailableBalance)
+                    </div>
+                </div>
+
+
+                <div id="bottom-account-row-@i" class="row">
+                    <div class="col-4">
+                        $@Html.DisplayFor(modelItem => item.AccountBalance)
+                    </div>
+                    <div class="col-8 clearfix">
+                        <span class="float-start">$@Html.DisplayFor(modelItem => item.AvailableBalance)</span>
+                        <a id="account-detail-link-@i" class="float-end" data-bs-toggle="collapse" href="#account-detail-row-@i" role="button" aria-expanded="false" aria-controls="account-detail-link-@i">
+                            More
+                        </a>
+                    </div>
+                </div>
+
+                <div id="account-detail-row-@i" class="collapse row mt-1">
+                    <div class="col-12">
+                        @Html.DisplayNameFor(model => model.Description): @Html.DisplayFor(modelItem => item.Description) <br />
+                        @Html.DisplayNameFor(model => model.HoldBalance): $@Html.DisplayFor(modelItem => item.HoldBalance) <br />
+                        @Html.DisplayNameFor(model => model.HoldsTotal): $@Html.DisplayFor(modelItem => item.HoldsTotal)<br />
+                        <button id="account-transfer-button-@i" type="button" class="btn btn-primary w-100">Transfer</button>
+                    </div>
+                </div>
+
+            </div>
+            i++;
+        }
+    }
 }

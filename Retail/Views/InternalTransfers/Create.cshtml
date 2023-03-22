@@ -1,0 +1,79 @@
+﻿@model Retail.Models.InternalTransfer
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<h4>InternalTransfer</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FromAccount" class="control-label"></label>
+                <input asp-for="FromAccount" class="form-control" />
+                <span asp-validation-for="FromAccount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ToAccount" class="control-label"></label>
+                <input asp-for="ToAccount" class="form-control" />
+                <span asp-validation-for="ToAccount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SchedulingOption" class="control-label"></label>
+                <input asp-for="SchedulingOption" class="form-control" />
+                <span asp-validation-for="SchedulingOption" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransferDate" class="control-label"></label>
+                <input asp-for="TransferDate" class="form-control" />
+                <span asp-validation-for="TransferDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Frequency" class="control-label"></label>
+                <input asp-for="Frequency" class="form-control" />
+                <span asp-validation-for="Frequency" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Delivery" class="control-label"></label>
+                <input asp-for="Delivery" class="form-control" />
+                <span asp-validation-for="Delivery" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndBy" class="control-label"></label>
+                <input asp-for="EndBy" class="form-control" />
+                <span asp-validation-for="EndBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumberOfTransfers" class="control-label"></label>
+                <input asp-for="NumberOfTransfers" class="form-control" />
+                <span asp-validation-for="NumberOfTransfers" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Memo" class="control-label"></label>
+                <input asp-for="Memo" class="form-control" />
+                <span asp-validation-for="Memo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

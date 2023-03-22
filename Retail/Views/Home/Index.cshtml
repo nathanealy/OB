@@ -9,12 +9,24 @@
 
 <div class="row">
 
-    <div class="col" id="accounts-partials">
+    <div class="col-4" id="accounts-partials">
         @{
             if (signInManager.IsSignedIn(User))
             {
                 await Html.RenderPartialAsync("_AccountInformation");
             }
+        }
+    </div>
+
+    <div class="col-4" id="transfers-partials">
+        @{
+
+        }
+    </div>
+
+    <div class="col-4" id="customer-service-partials">
+        @{
+
         }
     </div>
 
