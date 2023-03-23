@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Retail.Areas.Identity.Data;
 using Retail.Data;
 using Retail.Models;
 
@@ -13,10 +15,18 @@ namespace Retail.Controllers
     public class InternalTransfersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<HomeController> _logger;
+        private readonly SignInManager<RetailUser> _signInManager;
+        private readonly UserManager<RetailUser> _userManager;
 
-        public InternalTransfersController(ApplicationDbContext context)
+        public InternalTransfersController(ILogger<HomeController> logger, SignInManager<RetailUser> signInManager, UserManager<RetailUser> userManager, ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+            _logger = logger;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: InternalTransfers
@@ -47,8 +57,16 @@ namespace Retail.Controllers
 
         // GET: InternalTransfers/Create
         public IActionResult Create()
-        {
-            return View();
+        {           
+            InternalTransfer model = new InternalTransfer();
+
+            var schedulingOptions = _configuration.GetSection("TransferSettings:SchedulingOptions").Get<List<SelectListItem>>();
+            model.SchedulingOptionDropdown = new SelectList(schedulingOptions, "Value", "Text");
+
+            var frequencyOptions = _configuration.GetSection("TransferSettings:FrequnecyOptions").Get<List<SelectListItem>>();
+            model.FrequencyDropdown = new SelectList(frequencyOptions, "Value", "Text");
+
+            return View(model);
         }
 
         // POST: InternalTransfers/Create

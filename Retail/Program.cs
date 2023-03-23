@@ -17,12 +17,12 @@ builder.Services.AddDefaultIdentity<RetailUser>(options => options.SignIn.Requir
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-//        .RequireAuthenticatedUser()
-//        .Build();
-//});
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 var app = builder.Build();
 

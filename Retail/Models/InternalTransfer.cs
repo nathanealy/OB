@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Retail.Models;
 
 public partial class InternalTransfer
 {
+
     [Key]
     public long Id { get; set; }
 
@@ -50,6 +52,18 @@ public partial class InternalTransfer
     [DisplayName("Number of Transfers")]
     public long? NumberOfTransfers { get; set; }
 
-    [StringLength(30, ErrorMessage = "Maximum memo length is 20 character")]
+    [StringLength(30, ErrorMessage = "Maximum memo length is 30 character")]
     public string? Memo { get; set; }
+
+    [NotMapped]
+    public SelectList? FromAccountDropdown { get; set; }
+
+    [NotMapped]
+    public SelectList? ToAccountDropdown { get; set; }
+
+    [NotMapped]
+    public SelectList? SchedulingOptionDropdown { get; set; }
+
+    [NotMapped]
+    public SelectList? FrequencyDropdown { get; set; }
 }
