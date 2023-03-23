@@ -57,16 +57,62 @@ namespace Retail.Controllers
 
         // GET: InternalTransfers/Create
         public IActionResult Create()
-        {           
-            InternalTransfer model = new InternalTransfer();
+        {
 
-            var schedulingOptions = _configuration.GetSection("TransferSettings:SchedulingOptions").Get<List<SelectListItem>>();
-            model.SchedulingOptionDropdown = new SelectList(schedulingOptions, "Value", "Text");
 
-            var frequencyOptions = _configuration.GetSection("TransferSettings:FrequnecyOptions").Get<List<SelectListItem>>();
-            model.FrequencyDropdown = new SelectList(frequencyOptions, "Value", "Text");
+            if (_signInManager.IsSignedIn(User))
+            {
+                var userId = _userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
 
-            return View(model);
+                try
+                {
+                    var user = _userManager.Users.Where(u => u.Id == userId);
+                    var ssn = user.First().SocialSecurityNumber;
+                    var associatedAccounts = _context.AssociatedAccount.Where(a => a.SocialSecurityNumber == ssn).ToList();
+
+                    if (associatedAccounts == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    var ans = associatedAccounts.Select(x => x.AccountNumber);
+
+                    if (ans == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    var accounts = _context.AccountInformation.Where(a => ans.Contains(a.AccountNumber));
+
+                    if (accounts == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    }
+
+                    // return View(accounts);
+
+                    InternalTransfer model = new InternalTransfer();
+
+                    var schedulingOptions = _configuration.GetSection("TransferSettings:SchedulingOptions").Get<List<SelectListItem>>();
+                    model.SchedulingOptionDropdown = new SelectList(schedulingOptions, "Value", "Text");
+
+                    var frequencyOptions = _configuration.GetSection("TransferSettings:FrequnecyOptions").Get<List<SelectListItem>>();
+                    model.FrequencyDropdown = new SelectList(frequencyOptions, "Value", "Text");
+
+                    return View(model);
+
+                }
+                catch
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+            }
+
+
         }
 
         // POST: InternalTransfers/Create
